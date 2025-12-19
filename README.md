@@ -45,6 +45,19 @@ chmod +x start_api.sh
 - `search_videos` - Video searches
 - `search_books` - Book searches
 
+#### Typical configuration
+```python
+{
+  "mcpServers": {
+    "ddgs-search": {
+      "url": "http://localhost:8000/sse",
+      "disabled": false,
+      "alwaysAllow": []
+    }
+  }
+}
+```
+
 [Go To TOP](#TOP)
 ___
 
