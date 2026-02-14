@@ -45,7 +45,7 @@ def _convert_tuple_to_csv(_ctx: click.Context, _param: click.Parameter, value: t
 
 def _save_data(query: str, data: list[dict[str, str]], function_name: str, filename: str | None) -> None:
     filename, ext = filename.rsplit(".", 1) if filename and filename.endswith((".csv", ".json")) else (None, filename)
-    filename = filename if filename else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
+    filename = filename or f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
     if ext == "csv":
         _save_csv(f"{filename}.{ext}", data)
     elif ext == "json":
@@ -84,7 +84,12 @@ def _print_data(data: list[dict[str, str]], *, no_color: bool = False) -> None:
                 else:
                     title = k
                     text = v
-                click.secho(f"{title:<12}{text}", bg="black", fg=COLORS[j] if not no_color else "white", overline=True)
+                click.secho(
+                    f"{title:<12}{text}",
+                    bg="black",
+                    fg=COLORS[j] if not no_color else "white",
+                    overline=True,
+                )
             input()
 
 
@@ -103,7 +108,13 @@ def _sanitize_query(query: str) -> str:
 
 def _download_file(url: str, dir_path: str, filename: str, proxy: str | None, *, verify: bool) -> None:
     try:
-        resp = primp.Client(proxy=proxy, impersonate="random", impersonate_os="random", timeout=10, verify=verify).get(
+        resp = primp.Client(
+            proxy=proxy,
+            impersonate="random",
+            impersonate_os="random",
+            timeout=10,
+            verify=verify,
+        ).get(
             url,
         )
         if resp.status_code == 200:
@@ -124,7 +135,7 @@ def _download_results(
     *,
     verify: bool = True,
 ) -> None:
-    path = pathname if pathname else f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
+    path = pathname or f"{function_name}_{query}_{datetime.now(tz=timezone.utc):%Y%m%d_%H%M%S}"
     Path(path).mkdir(parents=True, exist_ok=True)
 
     threads = 10 if threads is None else threads
@@ -173,8 +184,18 @@ def version() -> str:
 @click.option("-q", "--query", help="text search query")
 @click.option("-k", "--keywords", help="(Deprecated) text search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
-@click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
-@click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
+@click.option(
+    "-s",
+    "--safesearch",
+    default="moderate",
+    type=click.Choice(["on", "moderate", "off"]),
+)
+@click.option(
+    "-t",
+    "--timelimit",
+    type=click.Choice(["d", "w", "m", "y"]),
+    help="day, week, month, year",
+)
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option(
@@ -199,11 +220,25 @@ def version() -> str:
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
+@click.option(
+    "-o",
+    "--output",
+    help="csv, json or filename.csv|json (save the results to a csv or json file)",
+)
+@click.option(
+    "-d",
+    "--download",
+    is_flag=True,
+    default=False,
+    help="download results. -dd to set custom directory",
+)
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option(
+    "-pr",
+    "--proxy",
+    help="the proxy to send requests, example: socks5h://127.0.0.1:9150",
+)
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def text(
@@ -256,7 +291,12 @@ def text(
 @click.option("-q", "--query", help="images search query")
 @click.option("-k", "--keywords", help="(Deprecated) images search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
-@click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
+@click.option(
+    "-s",
+    "--safesearch",
+    default="moderate",
+    type=click.Choice(["on", "moderate", "off"]),
+)
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]))
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
@@ -291,18 +331,36 @@ def text(
         ],
     ),
 )
-@click.option("-type", "--type_image", type=click.Choice(["photo", "clipart", "gif", "transparent", "line"]))
+@click.option(
+    "-type",
+    "--type_image",
+    type=click.Choice(["photo", "clipart", "gif", "transparent", "line"]),
+)
 @click.option("-l", "--layout", type=click.Choice(["Square", "Tall", "Wide"]))
 @click.option(
     "-lic",
     "--license_image",
     type=click.Choice(["any", "Public", "Share", "ShareCommercially", "Modify", "ModifyCommercially"]),
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-d", "--download", is_flag=True, default=False, help="download results. -dd to set custom directory")
+@click.option(
+    "-o",
+    "--output",
+    help="csv, json or filename.csv|json (save the results to a csv or json file)",
+)
+@click.option(
+    "-d",
+    "--download",
+    is_flag=True,
+    default=False,
+    help="download results. -dd to set custom directory",
+)
 @click.option("-dd", "--download-directory", help="Specify custom download directory")
 @click.option("-th", "--threads", default=10, help="download threads, default=10")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option(
+    "-pr",
+    "--proxy",
+    help="the proxy to send requests, example: socks5h://127.0.0.1:9150",
+)
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def images(
@@ -365,7 +423,12 @@ def images(
 @click.option("-q", "--query", help="videos search query")
 @click.option("-k", "--keywords", help="(Deprecated) videos search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
-@click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
+@click.option(
+    "-s",
+    "--safesearch",
+    default="moderate",
+    type=click.Choice(["on", "moderate", "off"]),
+)
 @click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m"]), help="day, week, month")
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
@@ -373,15 +436,23 @@ def images(
     "-b",
     "--backend",
     default=["auto"],
-    type=click.Choice(["auto", "all", "duckduckgo"]),
+    type=click.Choice(["auto", "all", "duckduckgo", "youtube"]),
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
 @click.option("-res", "--resolution", type=click.Choice(["high", "standart"]))
 @click.option("-d", "--duration", type=click.Choice(["short", "medium", "long"]))
 @click.option("-lic", "--license_videos", type=click.Choice(["creativeCommon", "youtube"]))
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option(
+    "-o",
+    "--output",
+    help="csv, json or filename.csv|json (save the results to a csv or json file)",
+)
+@click.option(
+    "-pr",
+    "--proxy",
+    help="the proxy to send requests, example: socks5h://127.0.0.1:9150",
+)
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def videos(
@@ -427,8 +498,18 @@ def videos(
 @click.option("-q", "--query", help="news search query")
 @click.option("-k", "--keywords", help="(Deprecated) news search query")  # deprecated
 @click.option("-r", "--region", default="us-en", help="us-en, ru-ru, etc.")
-@click.option("-s", "--safesearch", default="moderate", type=click.Choice(["on", "moderate", "off"]))
-@click.option("-t", "--timelimit", type=click.Choice(["d", "w", "m", "y"]), help="day, week, month, year")
+@click.option(
+    "-s",
+    "--safesearch",
+    default="moderate",
+    type=click.Choice(["on", "moderate", "off"]),
+)
+@click.option(
+    "-t",
+    "--timelimit",
+    type=click.Choice(["d", "w", "m", "y"]),
+    help="day, week, month, year",
+)
 @click.option("-m", "--max_results", default=10, type=int, help="maximum number of results")
 @click.option("-p", "--page", default=1, type=int, help="page number of results")
 @click.option(
@@ -439,8 +520,16 @@ def videos(
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option(
+    "-o",
+    "--output",
+    help="csv, json or filename.csv|json (save the results to a csv or json file)",
+)
+@click.option(
+    "-pr",
+    "--proxy",
+    help="the proxy to send requests, example: socks5h://127.0.0.1:9150",
+)
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def news(
@@ -489,8 +578,16 @@ def news(
     multiple=True,
     callback=_convert_tuple_to_csv,
 )
-@click.option("-o", "--output", help="csv, json or filename.csv|json (save the results to a csv or json file)")
-@click.option("-pr", "--proxy", help="the proxy to send requests, example: socks5h://127.0.0.1:9150")
+@click.option(
+    "-o",
+    "--output",
+    help="csv, json or filename.csv|json (save the results to a csv or json file)",
+)
+@click.option(
+    "-pr",
+    "--proxy",
+    help="the proxy to send requests, example: socks5h://127.0.0.1:9150",
+)
 @click.option("-v", "--verify", default=True, help="verify SSL when making the request")
 @click.option("-nc", "--no-color", is_flag=True, default=False, help="disable color output")
 def books(

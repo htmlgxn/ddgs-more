@@ -27,23 +27,27 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v6
     - name: Install dependencies
       run: |
-        python -m pip install -U pip
-        python -m pip install .[dev,api]
+        uv sync --dev --extra api
     - name: Ruff
       run: |
-        ruff check .
-        ruff format . --check
-    - name: Mypy
+        uv run ruff check .
+        uv run ruff format . --check
+    - name: Ty
       run: |
-        mypy --install-types --non-interactive .
+        uv run ty check .
+    - name: Build
+      run: |
+        uv build
     - name: Pytest
       id: pytest
       continue-on-error: true
       run: |
-        pytest -v
+        uv run pytest -v
     - name: Pytest re-run failures
       if: steps.pytest.outcome == 'failure'
       run: |
-        pytest -v --lf
+        uv run pytest -v --lf

@@ -1,9 +1,10 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.10.0,<0.11.0"]
+build-backend = "uv_build"
 
 [project]
 name = "ddgs"
+version = "9.10.0"
 description = "Dux Distributed Global Search. A metasearch library that aggregates results from diverse web search services."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -33,7 +34,6 @@ dependencies = [
     "httpx[http2,socks,brotli]>=0.28.1",  # temporarily
     "fake-useragent>=2.2.0",
 ]
-dynamic = ["version"]
 
 [project.urls]  # Optional
 "Homepage" = "https://github.com/deedy5/ddgs"
@@ -41,27 +41,24 @@ dynamic = ["version"]
 [project.scripts]
 ddgs = "ddgs.cli:safe_entry_point"
 
-[tool.setuptools.dynamic]
-version = {attr = "ddgs.__version__"}
-
-[tool.setuptools.packages.find]
-include = ["ddgs*"]
-exclude = ["api*"]
-
 [project.optional-dependencies]
+api = [
+    "fastapi[standard]>=0.104.0",
+    "fastapi-mcp>=0.4.0",
+]
+
+[dependency-groups]
 dev = [
-    "mypy>=1.17.1",
     "pre-commit",
     "pytest>=8.4.1",
     "pytest-dependency>=0.6.0",
     "ruff>=0.13.0",
-
-    # for mypy
+    "ty>=0.0.16",
     "lxml-stubs",
     "types-Pygments",
     "types-pexpect",
     "types-PyYAML",
-    "types-ujson"
+    "types-ujson",
 ]
 api = [
     "fastapi[standard]>=0.104.0",
@@ -140,10 +137,18 @@ ignore = [
     "N818",  # Exception name {name} should be named with an Error suffix
     "PLR0913",  # Too many arguments to function call
     "PLR2004",  # Magic value used in comparison
+    "PYI034",  # `__enter__` methods should use `Self` return type
     "SLF001",  # Private member accessed
 ]
 
-[tool.mypy]
-python_version = "3.10"
-strict = true
-exclude = ["build/"]
+[tool.ty.rules]
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
+invalid-return-type = "ignore"
+invalid-type-form = "ignore"
+possibly-missing-attribute = "ignore"
+unused-type-ignore-comment = "ignore"
+
+[tool.uv.build-backend]
+module-name = "ddgs"
+module-root = "."

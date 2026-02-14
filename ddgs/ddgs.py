@@ -44,7 +44,13 @@ class DDGS:
     threads: ClassVar[int | None] = None
     _executor: ClassVar[ThreadPoolExecutor | None] = None
 
-    def __init__(self, proxy: str | None = None, timeout: int | None = 5, *, verify: bool | str = True) -> None:
+    def __init__(
+        self,
+        proxy: str | None = None,
+        timeout: int | None = 5,
+        *,
+        verify: bool | str = True,
+    ) -> None:
         self._proxy = _expand_proxy_tb_alias(proxy) or os.environ.get("DDGS_PROXY")
         self._timeout = timeout
         self._verify = verify

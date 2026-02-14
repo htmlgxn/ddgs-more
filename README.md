@@ -5,10 +5,12 @@ A metasearch library that aggregates results from diverse web search services.
 
 
 ## Table of Contents
+* [Modes Of Use](#modes-of-use)
 * [API Server (with MCP Integration)](#api-server-with-mcp-integration)
 * [Install](#install)
 * [CLI version](#cli-version)
 * [Engines](#engines)
+* [Engine Development Guide](#engine-development-guide)
 * [DDGS class](#ddgs-class)
 * [1. text()](#1-text)
 * [2. images()](#2-images)
@@ -18,17 +20,27 @@ A metasearch library that aggregates results from diverse web search services.
 * [Disclaimer](#disclaimer)
 
 ___
+## Modes Of Use
+- **Library mode (primary)**: import and call `DDGS` directly (best fit for bot integrations).
+- **CLI mode**: use the `ddgs` command for ad-hoc querying.
+- **API/MCP mode (optional)**: run FastAPI + MCP transports for local/remote service access.
+
+[Go To TOP](#TOP)
+___
+
 ## API Server (with MCP Integration)
+This is an optional wrapper around the core `ddgs` library.
+
 -  **Docker compose**
 ```bash
 git clone https://github.com/deedy5/ddgs && cd ddgs
 docker-compose up --build
 ```
--  **Bash**
+-  **uv**
 ```bash
 git clone https://github.com/deedy5/ddgs && cd ddgs
-chmod +x start_api.sh
-./start_api.sh
+uv sync --dev --extra api
+uv run python start_api.py
 ```
 
 #### Available Endpoints
@@ -66,6 +78,10 @@ ___
 pip install -U ddgs
 ```
 
+```bash
+uv add ddgs
+```
+
 ## CLI version
 
 ```python3
@@ -80,9 +96,15 @@ ddgs --help
 | --------------|:-------------------|
 | text()        | `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `yandex`, `yahoo`, `wikipedia`|
 | images()      | `duckduckgo` |
-| videos()      | `duckduckgo` |
+| videos()      | `duckduckgo`, `youtube` |
 | news()        | `bing`, `duckduckgo`, `yahoo` |
 | books()       | `annasarchive` |
+
+[Go To TOP](#TOP)
+
+## Engine Development Guide
+
+See `docs/adding-engines.md` for the complete workflow to add new backends.
 
 [Go To TOP](#TOP)
 

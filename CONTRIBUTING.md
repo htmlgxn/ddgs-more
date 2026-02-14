@@ -7,7 +7,6 @@ Please open a Discussion, Issue, or email the maintainers to talk over any major
 If you use **VSCode**, install recommended extensions (press `F1` → *Show Recommended Extensions*):
 
 - `ms-python.python`
-- `ms-python.mypy-type-checker`
 - `charliermarsh.ruff`
 - `usernamehw.errorlens`
 - `fill-labs.dependi`
@@ -20,17 +19,15 @@ If you use **VSCode**, install recommended extensions (press `F1` → *Show Reco
    cd ddgs
    ```
 
-2. Create and activate a virtual environment, then install development dependencies:
+2. Sync development dependencies with `uv`:
    ```sh
-   python -m venv .venv
-   source .venv/bin/activate  # Windows: .venv\Scripts\activate
-   pip install -e .[dev]
+   uv sync --dev
    ```
 3. Install pre-commit hooks (automates formatting, linting, typing):
    ```sh
    pre-commit install
    ```
-   - Hooks run `ruff` and `mypy` automatically on each commit.
+   - Hooks run `ruff` and `ty` automatically on each commit.
    - To run them manually: `pre-commit run --all-files`.
 
 3. Create a feature branch:
@@ -57,7 +54,7 @@ If you use **VSCode**, install recommended extensions (press `F1` → *Show Reco
 ## Code style
 
    - Formatting and linting are enforced with **ruff**.
-   - Static typing is checked with **mypy**.
+   - Static typing is checked with **ty**.
 
 ## PR checklist
 

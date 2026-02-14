@@ -1,37 +1,31 @@
-PY := .venv/bin/python
-PIP := .venv/bin/pip
-
 .PHONY: help setup lint format test all clean
 
 help:
 	@echo "Targets:"
-	@echo "  setup   - create venv and install dependencies"
-	@echo "  lint    - run ruff check, ruff format and mypy"
-	@echo "  format  - run ruff format and ruff check --fix"
+	@echo "  setup   - sync uv environment with dev dependencies"
+	@echo "  lint    - run ruff check and ty"
+	@echo "  format  - run ruff format"
 	@echo "  test    - run pytest"
 	@echo "  all     - run setup, lint, format and test"
-	@echo "  clean   - remove cache, venv and build artifacts"
+	@echo "  clean   - remove cache and build artifacts"
 
 setup:
-	python3 -m venv .venv
-	$(PIP) install -e .[dev]
+	uv sync --dev
 
 lint:
-	$(PY) -m ruff check --fix
-	$(PY) -m mypy --install-types --non-interactive .
+	uv run ruff check --fix
+	uv run ty check .
 
 format:
-	$(PY) -m ruff format
+	uv run ruff format
 
 test:
-	$(PY) -m pytest
+	uv run pytest
 
 all: setup lint format test
 
 clean:
-	rm -rf .venv/
 	rm -rf .pytest_cache/
-	rm -rf .mypy_cache/
 	rm -rf .ruff_cache/
 	rm -rf build/
 	rm -rf dist/
